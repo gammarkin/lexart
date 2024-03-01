@@ -1,4 +1,4 @@
-import * as pg from 'pg';
+import pg from 'pg';
 import { Sequelize } from 'sequelize';
 
 const POSTGRES_URL = process.env.POSTGRES_URL || '';
