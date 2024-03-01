@@ -1,23 +1,20 @@
 import Sequelize from "sequelize";
 import model from "./connect.js";
 
-const Products = model.define("products",
+const Auth = model.define("auth",
     {
         id: {
             type: Sequelize.INTEGER,
             primaryKey: true,
             autoIncrement: true,
         },
-        name: {
+        email: {
             type: Sequelize.STRING,
             allowNull: false,
+            unique: true,
         },
-        details: {
-            type: Sequelize.JSONB,
-            allowNull: false,
-        },
-        price: {
-            type: Sequelize.INTEGER,
+        password: {
+            type: Sequelize.STRING,
             allowNull: false,
         },
     },
@@ -26,4 +23,4 @@ const Products = model.define("products",
     }
 );
 
-export default Products;
+export default Auth;

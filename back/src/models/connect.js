@@ -1,13 +1,9 @@
-const { Sequelize } = require('sequelize');
+import { Sequelize } from 'sequelize';
 
-const sequelize = new Sequelize('postgres://user:pass@example.com:5432/dbname')
+const POSTGRES_URL = process.env.POSTGRES_URL || '';
+const password = process.env.POSTGRES_PASSWORD || '';
 
-try {
-    await sequelize.authenticate();
 
-    console.log('Connection has been established successfully.');
-} catch (error) {
-    console.error('Unable to connect to the database:', error);
-}
+const sequelize = new Sequelize(POSTGRES_URL, { dialect: 'postgres', password })
 
 export default sequelize;

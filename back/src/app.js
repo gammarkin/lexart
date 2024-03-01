@@ -1,25 +1,20 @@
 import "dotenv/config";
 
 import express from "express";
-import routes from "./routes/index.js";
 import cors from "cors";
 
-const PORT = 3000;
+import routes from "./routes/index.js";
+
+const PORT = 3001;
 
 const app = express();
 
 app.use(cors());
 app.use(routes);
 
-app.get("/ping", (req, res) => {
-    console.log("ping");
+app.get("/", (_req, res) => { res.status(200).json({ message: "Hello from lex" }) });
 
-    res.status(200).json({
-        message: "Hello from lex",
-    });
-});
-
-app.use((err, req, res, next) => {
+app.use((err, _req, res, _next) => {
     console.error(err.stack);
 
     res.status(500).json({
