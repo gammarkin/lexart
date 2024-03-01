@@ -1,5 +1,7 @@
 import { Router } from "express";
 
+const router = Router();
+
 router.get("/products", (req, res) => {
     res.status(200).json({
         message: "Products",
@@ -29,7 +31,5 @@ router.delete("/products/:id", (req, res) => {
         message: "Delete product",
     });
 });
-
-const router = Router();
 
 export default router
