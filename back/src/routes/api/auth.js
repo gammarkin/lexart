@@ -1,6 +1,7 @@
 import { Router } from "express";
 import { Auth } from '../../models/index.js';
 import { hashPassword, comparePassword } from "../../utils/hash.js";
+import { createNewToken } from '../../middlewares/checkAuth.js'
 
 
 const router = Router();
@@ -10,7 +11,7 @@ router.post("/register", async (req, res) => {
 
     await Auth.create({ ...body, password: hashPassword(body.password) });
 
-    res.status(200).json({ ok: true });
+    res.status(200).json({ token: createNewToken(body) });
 });
 
 router.post("/login", async (req, res) => {
