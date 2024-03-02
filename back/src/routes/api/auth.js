@@ -6,6 +6,10 @@ import { createNewToken } from '../../middlewares/checkAuth.js'
 
 const router = Router();
 
+router.post("/token", async (req, res) => {
+    return res.status(200).json({ token: createNewToken(req.body) });
+});
+
 router.post("/register", async (req, res) => {
     const body = req.body || {}
 
