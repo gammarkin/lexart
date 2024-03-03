@@ -1,7 +1,7 @@
 import Sequelize from "sequelize";
 import model from "./connect.js";
 
-const Auth = model.define("auth",
+const Auth = model.define("auths",
     {
         id: {
             type: Sequelize.INTEGER,
