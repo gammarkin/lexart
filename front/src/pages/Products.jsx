@@ -1,6 +1,6 @@
 import {useLocation, useNavigate} from 'react-router-dom';
 import {useEffect, useState} from 'react';
-import {TextInput, Alert, Button} from '@mantine/core';
+import {TextInput, Alert, Button, Loader} from '@mantine/core';
 
 import CreateProduct from '../components/CreateProduct.jsx';
 import EditProduct from '../components/EditProduct.jsx';
@@ -13,6 +13,7 @@ export default function Products() {
 	const [filteredProducts, setFilteredProducts] = useState([]);
 
 	const [opened, setOpened] = useState(false);
+	const [loading, setLoading] = useState(false);
 	const [editProduct, openEditProduct] = useState({details: {}});
 
 	const location = useLocation();
@@ -54,14 +55,17 @@ export default function Products() {
 		let once = false;
 
 		if (alert || !once) {
+			setLoading(true);
+
 			axios.get('http://localhost:3001/api/products').then((response) => {
 				setFilteredProducts(response.data.products);
 				setProducts(response.data.products);
 			});
 
 			once = true;
+			setLoading(false);
 		}
-	}, [alert]);
+	}, [alert, setAlert]);
 
 	const handleSearchProducts = async (query) => {
 		if (!query) {
@@ -75,16 +79,42 @@ export default function Products() {
 		);
 	};
 
-	const deleteProduct = (product) => {
-		console.log(product);
+	const deleteProduct = async (product) => {
+		setLoading(true);
+		await axios.delete(`http://localhost:3001/api/products/${product.id}`);
+
+		setLoading(false);
+		setAlert('Product deleted!');
+		return setTimeout(() => setAlert(''), 3000);
 	};
+
+	if (loading) {
+		return (
+			<div
+				style={{height: '100vh'}}
+				className="d-flex justify-content-center align-items-center"
+			>
+				<Loader color="dark" />
+			</div>
+		);
+	}
 
 	return (
 		<div>
 			{alert && <Alert title={alert} color="blue" />}
 
-			<CreateProduct setOpened={setOpened} opened={opened} />
-			<EditProduct setOpened={openEditProduct} opened={editProduct} />
+			<CreateProduct
+				setOpened={setOpened}
+				setAlert={setAlert}
+				opened={opened}
+				setLoading={setLoading}
+			/>
+			<EditProduct
+				setOpened={openEditProduct}
+				setAlert={setAlert}
+				opened={editProduct}
+				setLoading={setLoading}
+			/>
 
 			<div className="d-flex justify-content-between m-3">
 				<TextInput

@@ -1,11 +1,16 @@
 /* eslint-disable react/prop-types */
 
-import {TextInput, Button, Modal} from '@mantine/core';
+import {TextInput, Button, NumberInput, Modal} from '@mantine/core';
 import {useState} from 'react';
 
 import axios from 'axios';
 
-export default function CreateProduct({setOpened, opened, setAlert}) {
+export default function CreateProduct({
+	setOpened,
+	opened,
+	setAlert,
+	setLoading,
+}) {
 	const [productName, setProductName] = useState('');
 	const [brand, setBrand] = useState('');
 	const [color, setColor] = useState('');
@@ -24,6 +29,7 @@ export default function CreateProduct({setOpened, opened, setAlert}) {
 		};
 
 		await axios.post('http://localhost:3001/api/products', product);
+		setLoading(true);
 		setOpened(false);
 
 		setProductName('');
@@ -32,6 +38,7 @@ export default function CreateProduct({setOpened, opened, setAlert}) {
 		setModel('');
 		setPrice('');
 
+		setLoading(false);
 		setAlert('Product created!');
 		return setTimeout(() => setAlert(''), 3000);
 	};
@@ -70,11 +77,20 @@ export default function CreateProduct({setOpened, opened, setAlert}) {
 				className="mb-3"
 			/>
 
-			<TextInput
+			<NumberInput
+				label="Price"
+				withAsterisk
 				placeholder="Price"
 				style={{width: '25rem'}}
-				onChange={(event) => setPrice(event.currentTarget.value)}
+				onChange={(val) => setPrice(val)}
 				className="mb-3"
+				value={price}
+				parser={(value) => value.replace(/\$\s?|(,*)/g, '')}
+				formatter={(value) =>
+					!Number.isNaN(parseFloat(value))
+						? `$ ${value}`.replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ',')
+						: '$ '
+				}
 			/>
 
 			<Button style={{width: '100%'}} onClick={createProduct}>

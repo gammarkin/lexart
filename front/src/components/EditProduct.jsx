@@ -1,16 +1,17 @@
 /* eslint-disable react/prop-types */
 
-import {TextInput, Button, Modal} from '@mantine/core';
+import {TextInput, NumberInput, Button, Modal} from '@mantine/core';
 import {useState, useEffect} from 'react';
 
 import axios from 'axios';
 
-export default function EditProduct({setOpened, opened, setAlert}) {
+export default function EditProduct({setOpened, opened, setAlert, setLoading}) {
 	const [productName, setProductName] = useState('');
 	const [brand, setBrand] = useState('');
 	const [color, setColor] = useState('');
 	const [model, setModel] = useState('');
 	const [price, setPrice] = useState('');
+	const [id, setId] = useState('');
 
 	useEffect(() => {
 		if (opened.details.brand) {
@@ -19,6 +20,7 @@ export default function EditProduct({setOpened, opened, setAlert}) {
 			setColor(opened.details.color);
 			setModel(opened.details.model);
 			setPrice(opened.price);
+			setId(opened.id);
 		}
 	}, [opened]);
 
@@ -31,7 +33,10 @@ export default function EditProduct({setOpened, opened, setAlert}) {
 				color,
 			},
 			price,
+			id,
 		};
+
+		setLoading(true);
 
 		await axios.put(
 			`http://localhost:3001/api/products/${product.id}`,
@@ -44,8 +49,10 @@ export default function EditProduct({setOpened, opened, setAlert}) {
 		setColor('');
 		setModel('');
 		setPrice('');
+		setId('');
+		setLoading(false);
 
-		setAlert('Product created!');
+		setAlert('Product Edited!');
 		return setTimeout(() => setAlert(''), 3000);
 	};
 
@@ -95,14 +102,20 @@ export default function EditProduct({setOpened, opened, setAlert}) {
 				withAsterisk
 			/>
 
-			<TextInput
+			<NumberInput
 				label="Price"
 				withAsterisk
 				placeholder="Price"
 				style={{width: '25rem'}}
-				onChange={(event) => setPrice(event.currentTarget.value)}
+				onChange={(val) => setPrice(val)}
 				className="mb-3"
 				value={price}
+				parser={(value) => value.replace(/\$\s?|(,*)/g, '')}
+				formatter={(value) =>
+					!Number.isNaN(parseFloat(value))
+						? `$ ${value}`.replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ',')
+						: '$ '
+				}
 			/>
 
 			<Button style={{width: '100%'}} onClick={editProduct}>
