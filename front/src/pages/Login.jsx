@@ -17,10 +17,13 @@ export default function Login() {
 			return null;
 		}
 
-		const response = await axios.post('http://localhost:3001/api/login', {
-			email,
-			password,
-		});
+		const response = await axios.post(
+			'https://lexart-back.vercel.app/api/login',
+			{
+				email,
+				password,
+			}
+		);
 
 		if (response.status === 200) {
 			localStorage.setItem('token', response.data.token);

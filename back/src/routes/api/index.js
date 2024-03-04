@@ -5,15 +5,24 @@ import authRoutes from "./auth.js";
 import productRoutes from "./products.js";
 
 const corsOptions = {
-    origin: ["http://localhost:3001", "http://127.0.0.1:3001", 'https://lexart-lilac.vercel.app/'],
+    origin: [
+        'https://lexart-lilac.vercel.app',
+        'https://lexart-back.vercel.app',
+    ],
     credentials: true,
 };
 
 const router = express.Router();
 
-const corsMiddleware = cors(corsOptions);
+const conditionalCorsMiddleware = (req, res, next) => {
+    if (req.path.includes("/api")) {
+        cors(corsOptions)(req, res, next);
+    } else {
+        next();
+    }
+};
 
-router.use(corsMiddleware); // protect routes from outside requests
+router.use(conditionalCorsMiddleware);
 router.use(productRoutes, authRoutes);
 
 export default router;
