@@ -38,7 +38,7 @@ export default function Products() {
 			}
 
 			const response = await axios
-				.post('http://localhost:3001/api/check/token', {token})
+				.post('http://lexart-back.vercel.app/api/check/token', {token})
 				.catch(() => {
 					return navigate('/login');
 				});
@@ -57,10 +57,12 @@ export default function Products() {
 		if (alert || !once) {
 			setLoading(true);
 
-			axios.get('http://localhost:3001/api/products').then((response) => {
-				setFilteredProducts(response.data.products);
-				setProducts(response.data.products);
-			});
+			axios
+				.get('http://lexart-back.vercel.app/api/products')
+				.then((response) => {
+					setFilteredProducts(response.data.products);
+					setProducts(response.data.products);
+				});
 
 			once = true;
 			setLoading(false);
@@ -81,7 +83,9 @@ export default function Products() {
 
 	const deleteProduct = async (product) => {
 		setLoading(true);
-		await axios.delete(`http://localhost:3001/api/products/${product.id}`);
+		await axios.delete(
+			`http://lexart-back.vercel.app/api/products/${product.id}`
+		);
 
 		setLoading(false);
 		setAlert('Product deleted!');
@@ -109,6 +113,7 @@ export default function Products() {
 				opened={opened}
 				setLoading={setLoading}
 			/>
+
 			<EditProduct
 				setOpened={openEditProduct}
 				setAlert={setAlert}
@@ -123,7 +128,14 @@ export default function Products() {
 					onChange={(event) => handleSearchProducts(event.currentTarget.value)}
 				/>
 
-				<Button onClick={() => setOpened(true)}>+ Add Product</Button>
+				<div>
+					<Button className="m-1" onClick={() => setOpened(true)}>
+						+ Add Product
+					</Button>
+					<Button className="m-1" onClick={() => navigate('/get-token')}>
+						Use external API
+					</Button>
+				</div>
 			</div>
 
 			<table
