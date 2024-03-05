@@ -8,7 +8,7 @@ const router = express.Router();
 router.use(json());
 
 router.use("/api", function (_req, res, next) {
-    res.header("Access-Control-Allow-Origin", 'https://lexart-back.vercel.app/');
+    res.header("Access-Control-Allow-Origin", 'https://lexart-lilac.vercel.app');
     res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
 
     next();

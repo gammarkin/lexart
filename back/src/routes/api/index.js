@@ -6,7 +6,7 @@ import cors from "cors";
 
 const router = express.Router();
 
-const whitelist = ['https://lexart-lilac.vercel.app, https://lexart-back.vercel.app']
+const whitelist = ['https://lexart-lilac.vercel.app']
 
 const corsOptions = {
     origin: function (origin, callback) {
