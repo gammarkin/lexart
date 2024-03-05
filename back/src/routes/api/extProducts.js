@@ -25,6 +25,12 @@ router.get("/products/:id", checkAuth, async (req, res) => {
 router.post("/products", checkAuth, async (req, res) => {
     const product = formatProduct(req.body);
 
+    if (Array.isArray(product)) {
+        await Promise.all(product.map(prod => Products.create(prod)));
+
+        return res.status(200).json({ ok: true });
+    }
+
     await Products.create(product);
 
     res.status(200).json({ ok: true });
