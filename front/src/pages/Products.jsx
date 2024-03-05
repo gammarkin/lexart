@@ -38,7 +38,7 @@ export default function Products() {
 			}
 
 			const response = await axios
-				.post('http://lexart-back.vercel.app/api/check/token', {token})
+				.post('https://lexart-back.vercel.app/api/check/token', {token})
 				.catch(() => {
 					return navigate('/login');
 				});
@@ -58,7 +58,7 @@ export default function Products() {
 			setLoading(true);
 
 			axios
-				.get('http://lexart-back.vercel.app/api/products')
+				.get('https://lexart-back.vercel.app/api/products')
 				.then((response) => {
 					setFilteredProducts(response.data.products);
 					setProducts(response.data.products);
@@ -84,7 +84,7 @@ export default function Products() {
 	const deleteProduct = async (product) => {
 		setLoading(true);
 		await axios.delete(
-			`http://lexart-back.vercel.app/api/products/${product.id}`
+			`https://lexart-back.vercel.app/api/products/${product.id}`
 		);
 
 		setLoading(false);
