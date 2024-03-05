@@ -3,7 +3,7 @@
 import {TextInput, Button, NumberInput, Modal} from '@mantine/core';
 import {useState} from 'react';
 
-import axios from 'axios';
+import api from '../utils/apiConfig';
 
 export default function CreateProduct({
 	setOpened,
@@ -16,8 +16,13 @@ export default function CreateProduct({
 	const [color, setColor] = useState('');
 	const [model, setModel] = useState('');
 	const [price, setPrice] = useState('');
+	const [submitted, setSubmitted] = useState(false);
 
 	const createProduct = async () => {
+		if (!productName || !brand || !color || !model || !price) {
+			return setSubmitted(true);
+		}
+
 		const product = {
 			name: productName,
 			details: {
@@ -28,9 +33,10 @@ export default function CreateProduct({
 			price,
 		};
 
-		await axios.post('https://lexart-back.vercel.app/api/products', product);
+		await api.post('/api/products', product);
 		setLoading(true);
 		setOpened(false);
+		setSubmitted(false);
 
 		setProductName('');
 		setBrand('');
@@ -47,13 +53,19 @@ export default function CreateProduct({
 		<Modal
 			title="Create product"
 			opened={opened}
-			onClose={() => setOpened(false)}
+			onClose={() => {
+				setOpened(false);
+				setSubmitted(false);
+			}}
 		>
 			<TextInput
 				placeholder="Product name"
 				style={{width: '25rem'}}
 				onChange={(event) => setProductName(event.currentTarget.value)}
 				className="mb-3"
+				error={
+					!productName && opened && submitted && 'Product name is required'
+				}
 			/>
 
 			<TextInput
@@ -61,6 +73,7 @@ export default function CreateProduct({
 				style={{width: '25rem'}}
 				onChange={(event) => setBrand(event.currentTarget.value)}
 				className="mb-3"
+				error={!brand && opened && submitted && 'Brand is required'}
 			/>
 
 			<TextInput
@@ -68,6 +81,7 @@ export default function CreateProduct({
 				style={{width: '25rem'}}
 				onChange={(event) => setColor(event.currentTarget.value)}
 				className="mb-3"
+				error={!color && opened && submitted && 'Color is required'}
 			/>
 
 			<TextInput
@@ -75,9 +89,11 @@ export default function CreateProduct({
 				style={{width: '25rem'}}
 				onChange={(event) => setModel(event.currentTarget.value)}
 				className="mb-3"
+				error={!model && opened && submitted && 'Model is required'}
 			/>
 
 			<NumberInput
+				error={!price && opened && submitted && 'Price is required'}
 				label="Price"
 				withAsterisk
 				placeholder="Price"

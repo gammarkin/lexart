@@ -9,6 +9,7 @@ import Login from './pages/Login.jsx';
 import Products from './pages/Products.jsx';
 import GetToken from './pages/GetToken.jsx';
 import NotFound from './pages/NotFound.jsx';
+import Register from './pages/Register.jsx';
 
 import 'bootstrap/dist/css/bootstrap.min.css';
 
@@ -28,6 +29,10 @@ const router = createBrowserRouter([
 	{
 		path: '/get-token',
 		element: <GetToken />,
+	},
+	{
+		path: '/register',
+		element: <Register />,
 	},
 	{
 		path: '*',

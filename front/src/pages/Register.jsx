@@ -102,8 +102,8 @@ export default function Login() {
 						>
 							<div className="card-body p-5 text-center">
 								<div className="mb-md-5 mt-md-4 pb-5">
-									<h2 className="fw-bold mb-2 text-uppercase">Login</h2>
-									<p className="text-white-50 mb-5">Welcome back!</p>
+									<h2 className="fw-bold mb-2 text-uppercase">Register</h2>
+									<p className="text-white-50 mb-5">Welcome!</p>
 
 									<TextInput
 										placeholder="Email"
@@ -121,21 +121,12 @@ export default function Login() {
 										onKeyDown={(e) => handleKeyEnter(e)}
 									/>
 
-									<p
-										onClick={() => navigate('/register')}
-										className="small mb-5 pb-lg-2"
-									>
-										<a className="text-white-50">
-											Does not have an account? Register
-										</a>
-									</p>
-
 									<button
-										className="btn btn-outline-light btn-lg px-5"
+										className="btn btn-outline-light mt-5 btn-lg px-5"
 										type="submit"
 										onClick={handleSubmit}
 									>
-										Login
+										Register
 									</button>
 								</div>
 							</div>

@@ -1,20 +1,31 @@
 import {useLocation, useNavigate} from 'react-router-dom';
 import {useEffect, useState} from 'react';
-import {TextInput, Alert, Button, Loader} from '@mantine/core';
+import {TextInput, Alert, Button, Loader, Select} from '@mantine/core';
 
 import CreateProduct from '../components/CreateProduct.jsx';
 import EditProduct from '../components/EditProduct.jsx';
 
-import axios from 'axios';
+import api from '../utils/apiConfig.js';
+
+import Down from '../assets/down.png';
 
 export default function Products() {
 	const [alert, setAlert] = useState('');
 	const [products, setProducts] = useState([]);
 	const [filteredProducts, setFilteredProducts] = useState([]);
+	const [searchName, setSearchName] = useState('name');
 
 	const [opened, setOpened] = useState(false);
 	const [loading, setLoading] = useState(false);
 	const [editProduct, openEditProduct] = useState({details: {}});
+
+	const [sortOrder, setSortOrder] = useState({
+		name: 'asc',
+		brand: 'asc',
+		model: 'asc',
+		price: 'asc',
+		color: 'asc',
+	});
 
 	const location = useLocation();
 	const navigate = useNavigate();
@@ -37,11 +48,9 @@ export default function Products() {
 				return navigate('/login');
 			}
 
-			const response = await axios
-				.post('https://lexart-back.vercel.app/api/check/token', {token})
-				.catch(() => {
-					return navigate('/login');
-				});
+			const response = await api.post('/api/check/token', {token}).catch(() => {
+				return navigate('/login');
+			});
 
 			if (response.status !== 200) {
 				return navigate('/login');
@@ -57,35 +66,99 @@ export default function Products() {
 		if (alert || !once) {
 			setLoading(true);
 
-			axios
-				.get('https://lexart-back.vercel.app/api/products')
-				.then((response) => {
-					setFilteredProducts(response.data.products);
-					setProducts(response.data.products);
-				});
+			api.get('/api/products').then((response) => {
+				setFilteredProducts(response.data.products);
+				setProducts(response.data.products);
+			});
 
 			once = true;
 			setLoading(false);
 		}
 	}, [alert, setAlert]);
 
+	const toggleSortOrder = (column) => {
+		setSortOrder((prevSortOrder) => ({
+			...prevSortOrder,
+			[column]: prevSortOrder[column] === 'asc' ? 'desc' : 'asc',
+		}));
+	};
+
+	const sortProducts = (column) => {
+		if (column === 'price') {
+			setFilteredProducts((prevProducts) =>
+				[...prevProducts].sort((a, b) => {
+					const valueA = a[column];
+					const valueB = b[column];
+					const sortOrderMultiplier = sortOrder[column] === 'asc' ? 1 : -1;
+
+					return sortOrderMultiplier * (valueA - valueB);
+				})
+			);
+
+			return toggleSortOrder(column);
+		}
+
+		if (column.includes('details')) {
+			const nestedColumn = column.split('.')[1];
+			const sortOrderMultiplier = sortOrder[nestedColumn] === 'asc' ? 1 : -1;
+
+			setFilteredProducts((prevProducts) =>
+				[...prevProducts].sort(
+					(a, b) =>
+						sortOrderMultiplier *
+						a.details[nestedColumn].localeCompare(b.details[nestedColumn])
+				)
+			);
+
+			return toggleSortOrder(nestedColumn);
+		}
+
+		setFilteredProducts((prevProducts) =>
+			[...prevProducts].sort((a, b) => {
+				const sortOrderMultiplier = sortOrder[column] === 'asc' ? 1 : -1;
+
+				return sortOrderMultiplier * a[column].localeCompare(b[column]);
+			})
+		);
+
+		return toggleSortOrder(column);
+	};
+
 	const handleSearchProducts = async (query) => {
 		if (!query) {
 			return setFilteredProducts(products);
 		}
 
+		if (searchName === 'price') {
+			return setFilteredProducts(
+				products.filter((product) =>
+					String(product[searchName]).includes(query)
+				)
+			);
+		}
+
+		if (searchName.includes('.')) {
+			const nestedColumn = searchName.split('.')[1];
+
+			return setFilteredProducts(
+				products.filter((product) =>
+					product.details[nestedColumn]
+						.toLowerCase()
+						.includes(query.toLowerCase())
+				)
+			);
+		}
+
 		return setFilteredProducts(
 			products.filter((product) =>
-				product.name.toLowerCase().includes(query.toLowerCase())
+				product[searchName].toLowerCase().includes(query.toLowerCase())
 			)
 		);
 	};
 
 	const deleteProduct = async (product) => {
 		setLoading(true);
-		await axios.delete(
-			`https://lexart-back.vercel.app/api/products/${product.id}`
-		);
+		await api.delete(`/api/products/${product.id}`);
 
 		setLoading(false);
 		setAlert('Product deleted!');
@@ -122,11 +195,34 @@ export default function Products() {
 			/>
 
 			<div className="d-flex justify-content-between m-3">
-				<TextInput
-					placeholder="Search for a product name"
-					style={{width: '25rem'}}
-					onChange={(event) => handleSearchProducts(event.currentTarget.value)}
-				/>
+				<div className="d-flex">
+					<TextInput
+						placeholder={`Search for a product ${
+							searchName.includes('.')
+								? `by ${searchName.split('.')[1]}`
+								: `by ${searchName}`
+						}`}
+						style={{width: '25rem'}}
+						onChange={(event) =>
+							handleSearchProducts(event.currentTarget.value)
+						}
+					/>
+
+					<Select
+						style={{width: '7rem'}}
+						data={[
+							{label: 'Name', value: 'name'},
+							{label: 'Brand', value: 'details.brand'},
+							{label: 'Model', value: 'details.model'},
+							{label: 'Price', value: 'price'},
+							{label: 'Color', value: 'details.color'},
+						]}
+						value={searchName}
+						onChange={setSearchName}
+						placeholder="Search by"
+						className="mx-1"
+					/>
+				</div>
 
 				<div>
 					<Button className="m-1" onClick={() => setOpened(true)}>
@@ -144,16 +240,28 @@ export default function Products() {
 			>
 				<thead>
 					<tr>
-						<th>Name</th>
-						<th>Brand</th>
-						<th>Model</th>
-						<th>Price</th>
-						<th>Color</th>
-						<th>options</th>
+						<th onClick={() => sortProducts('name')}>
+							Name <img style={{width: '1rem'}} src={Down} />
+						</th>
+						<th onClick={() => sortProducts('details.brand')}>
+							Brand <img style={{width: '1rem'}} src={Down} />
+						</th>
+						<th onClick={() => sortProducts('details.model')}>
+							Model <img style={{width: '1rem'}} src={Down} />
+						</th>
+						<th onClick={() => sortProducts('price')}>
+							Price <img style={{width: '1rem'}} src={Down} />
+						</th>
+						<th onClick={() => sortProducts('details.color')}>
+							Color <img style={{width: '1rem'}} src={Down} />
+						</th>
+						<th>
+							options <img style={{width: '1rem'}} src={Down} />
+						</th>
 					</tr>
 				</thead>
 				<tbody>
-					{Array.isArray(products) &&
+					{Array.isArray(filteredProducts) &&
 						filteredProducts.map((product) => (
 							<tr key={product.id}>
 								<td>{product.name}</td>

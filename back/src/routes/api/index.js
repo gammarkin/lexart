@@ -18,7 +18,8 @@ const corsOptions = {
     }
 }
 
-router.use(cors(corsOptions));
+// router.use(cors(corsOptions));
+router.use(cors());
 
 router.use(productRoutes, authRoutes);
 

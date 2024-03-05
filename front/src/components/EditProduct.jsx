@@ -3,7 +3,7 @@
 import {TextInput, NumberInput, Button, Modal} from '@mantine/core';
 import {useState, useEffect} from 'react';
 
-import axios from 'axios';
+import api from '../utils/apiConfig';
 
 export default function EditProduct({setOpened, opened, setAlert, setLoading}) {
 	const [productName, setProductName] = useState('');
@@ -12,6 +12,7 @@ export default function EditProduct({setOpened, opened, setAlert, setLoading}) {
 	const [model, setModel] = useState('');
 	const [price, setPrice] = useState('');
 	const [id, setId] = useState('');
+	const [submitted, setSubmitted] = useState(false);
 
 	useEffect(() => {
 		if (opened.details.brand) {
@@ -25,6 +26,10 @@ export default function EditProduct({setOpened, opened, setAlert, setLoading}) {
 	}, [opened]);
 
 	const editProduct = async () => {
+		if (!productName || !brand || !color || !model || !price) {
+			return setSubmitted(true);
+		}
+
 		const product = {
 			name: productName,
 			details: {
@@ -36,13 +41,16 @@ export default function EditProduct({setOpened, opened, setAlert, setLoading}) {
 			id,
 		};
 
+		if (product === opened) {
+			setSubmitted(false);
+			return setOpened({details: {}});
+		}
+
 		setLoading(true);
 
-		await axios.put(
-			`https://lexart-back.vercel.app/api/products/${product.id}`,
-			product
-		);
+		await api.put(`/api/products/${product.id}`, product);
 		setOpened({details: {}});
+		setSubmitted(false);
 
 		setProductName('');
 		setBrand('');
@@ -70,6 +78,9 @@ export default function EditProduct({setOpened, opened, setAlert, setLoading}) {
 				className="mb-3"
 				value={productName}
 				withAsterisk
+				error={
+					!productName && opened && submitted && 'Product name is required'
+				}
 			/>
 
 			<TextInput
@@ -80,6 +91,7 @@ export default function EditProduct({setOpened, opened, setAlert, setLoading}) {
 				className="mb-3"
 				value={brand}
 				withAsterisk
+				error={!brand && opened && submitted && 'Brand is required'}
 			/>
 
 			<TextInput
@@ -90,6 +102,7 @@ export default function EditProduct({setOpened, opened, setAlert, setLoading}) {
 				className="mb-3"
 				value={color}
 				withAsterisk
+				error={!color && opened && submitted && 'Color is required'}
 			/>
 
 			<TextInput
@@ -100,9 +113,11 @@ export default function EditProduct({setOpened, opened, setAlert, setLoading}) {
 				className="mb-3"
 				value={model}
 				withAsterisk
+				error={!model && opened && submitted && 'Model is required'}
 			/>
 
 			<NumberInput
+				error={!price && opened && submitted && 'Price is required'}
 				label="Price"
 				withAsterisk
 				placeholder="Price"

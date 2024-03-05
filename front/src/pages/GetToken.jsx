@@ -1,7 +1,7 @@
 import {useState, useEffect} from 'react';
 import {CopyButton, Button, ScrollArea} from '@mantine/core';
 
-import axios from 'axios';
+import api from '../utils/apiConfig';
 
 export default function GetToken() {
 	const [token, setToken] = useState('');
@@ -13,10 +13,7 @@ export default function GetToken() {
 			}
 
 			const userToken = localStorage.getItem('token') || 'token';
-			const response = await axios.post(
-				'https://lexart-back.vercel.app/api/get/token',
-				{token: userToken}
-			);
+			const response = await api.post('/api/get/token', {token: userToken});
 
 			return setToken(response.data.token);
 		};
