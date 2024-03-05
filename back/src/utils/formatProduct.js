@@ -6,7 +6,7 @@ const formatProduct = (product = {}) => {
     if (Array.isArray(product)) {
         return product.flatMap(prod => prod.data.map(productData => ({
             name: prod.name,
-            petails: {
+            details: {
                 brand: prod.brand,
                 model: prod.model,
                 color: productData.color
