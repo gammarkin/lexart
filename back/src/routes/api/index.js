@@ -18,9 +18,7 @@ const corsOptions = {
     }
 }
 
-// router.use(cors(corsOptions));
-router.use(cors());
-
+router.use(cors(corsOptions));
 router.use(productRoutes, authRoutes);
 
 export default router;
