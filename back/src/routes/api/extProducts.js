@@ -1,7 +1,6 @@
 import { Router } from "express";
 import { Products } from '../../models/index.js';
 
-
 import checkAuth from "../../middlewares/checkAuth.js";
 import cors from "cors";
 

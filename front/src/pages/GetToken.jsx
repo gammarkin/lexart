@@ -4,7 +4,7 @@ import {CopyButton, Button, ScrollArea} from '@mantine/core';
 import axios from 'axios';
 
 export default function GetToken() {
-	const [token, setToken] = useState('token');
+	const [token, setToken] = useState('');
 
 	useEffect(() => {
 		const getToken = async () => {
@@ -12,7 +12,7 @@ export default function GetToken() {
 				return;
 			}
 
-			const userToken = localStorage.getItem('token');
+			const userToken = localStorage.getItem('token') || 'token';
 			const response = await axios.post(
 				'https://lexart-back.vercel.app/api/get/token',
 				{token: userToken}
@@ -63,12 +63,11 @@ export default function GetToken() {
 			</p>
 			<pre className="lead bold mb-5">{`Headers: {authorization: token}`}</pre>
 
-			<p className="lead bold">
-				Routes:
-				<pre className="lead bold m-2">get {`/ext/products`}</pre>
-				<pre className="lead bold m-2">get {`/ext/products/:id`}</pre>
-				<pre className="lead bold m-2">post {`/ext/products`}</pre>
-			</p>
+			<p className="lead bold">Routes:</p>
+
+			<pre className="lead bold m-2">get {`/ext/products`}</pre>
+			<pre className="lead bold m-2">get {`/ext/products/:id`}</pre>
+			<pre className="lead bold m-2">post {`/ext/products`}</pre>
 		</div>
 	);
 }
