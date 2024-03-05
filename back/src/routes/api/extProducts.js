@@ -1,6 +1,8 @@
 import { Router } from "express";
 import { Products } from '../../models/index.js';
 
+import formatProduct from "../../utils/formatProduct.js";
+
 import checkAuth from "../../middlewares/checkAuth.js";
 import cors from "cors";
 
@@ -21,7 +23,9 @@ router.get("/products/:id", checkAuth, async (req, res) => {
 });
 
 router.post("/products", checkAuth, async (req, res) => {
-    await Products.create(req.body);
+    const product = formatProduct(req.body);
+
+    await Products.create(product);
 
     res.status(200).json({ ok: true });
 });
