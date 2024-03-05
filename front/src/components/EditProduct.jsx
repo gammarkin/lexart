@@ -39,7 +39,7 @@ export default function EditProduct({setOpened, opened, setAlert, setLoading}) {
 		setLoading(true);
 
 		await axios.put(
-			`http://localhost:3001/api/products/${product.id}`,
+			`https://lexart-back.vercel.app/api/products/${product.id}`,
 			product
 		);
 		setOpened({details: {}});

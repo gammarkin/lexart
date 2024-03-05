@@ -28,7 +28,7 @@ export default function CreateProduct({
 			price,
 		};
 
-		await axios.post('http://localhost:3001/api/products', product);
+		await axios.post('https://lexart-back.vercel.app/api/products', product);
 		setLoading(true);
 		setOpened(false);
 
